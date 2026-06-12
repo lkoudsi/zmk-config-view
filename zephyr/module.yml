@@ -1,0 +1,4 @@
+manifest-version: 0.1
+name: zmk-config-view
+build:
+  cmake: true
