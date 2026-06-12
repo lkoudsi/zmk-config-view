@@ -18,13 +18,12 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/events/ble_active_profile_changed.h>
 #include <zmk/events/endpoint_changed.h>
-#include <zmk/events/wpm_state_changed.h>
+#include <zmk/events/keycode_state_changed.h>
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/usb.h>
 #include <zmk/ble.h>
 #include <zmk/endpoints.h>
 #include <zmk/keymap.h>
-#include <zmk/wpm.h>
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -42,23 +41,21 @@ struct layer_status_state {
     const char *label;
 };
 
-struct wpm_status_state {
-    uint8_t wpm;
+struct keycode_status_state {
+    uint32_t keycode;
+    uint16_t usage_page;
+    bool pressed;
 };
 
 static void draw_top(lv_obj_t *widget, const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
 
     lv_draw_label_dsc_t label_dsc;
-    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_montserrat_16, LV_TEXT_ALIGN_RIGHT);
-    lv_draw_label_dsc_t label_dsc_wpm;
-    init_label_dsc(&label_dsc_wpm, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_RIGHT);
+    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_montserrat_16, LV_TEXT_ALIGN_CENTER);
     lv_draw_rect_dsc_t rect_black_dsc;
     init_rect_dsc(&rect_black_dsc, LVGL_BACKGROUND);
     lv_draw_rect_dsc_t rect_white_dsc;
     init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
-    lv_draw_line_dsc_t line_dsc;
-    init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
 
     // Fill background
     lv_canvas_fill_bg(canvas, LVGL_BACKGROUND, LV_OPA_COVER);
@@ -88,38 +85,16 @@ static void draw_top(lv_obj_t *widget, const struct status_state *state) {
 
     canvas_draw_text(canvas, 0, 0, CANVAS_SIZE, &label_dsc, output_text);
 
-    // Draw WPM
-//    canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
-//    canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
+    // Draw currently pressed key
+    canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
+    canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
 
-//    char wpm_text[6] = {};
-//    snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-//    canvas_draw_text(canvas, 42, 52, 24, &label_dsc_wpm, wpm_text);
-
-/*    int max = 0;
-    int min = 256;
-
-    for (int i = 0; i < 10; i++) {
-        if (state->wpm[i] > max) {
-            max = state->wpm[i];
-        }
-        if (state->wpm[i] < min) {
-            min = state->wpm[i];
-        }
+    if (state->pressed_keycode != 0) {
+        char key_text[16] = {};
+        snprintf(key_text, sizeof(key_text), "0x%02X", state->pressed_keycode);
+        canvas_draw_text(canvas, 8, 35, 52, &label_dsc, key_text);
     }
 
-    int range = max - min;
-    if (range == 0) {
-        range = 1;
-    }
-
-    lv_point_t points[10];
-    for (int i = 0; i < 10; i++) {
-        points[i].x = 2 + i * 7;
-        points[i].y = 60 - (state->wpm[i] - min) * 36 / range;
-    }
-    canvas_draw_line(canvas, points, 10, &line_dsc);
-*/
     // Rotate canvas
     rotate_canvas(canvas);
 }
@@ -307,27 +282,30 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_layer_status, struct layer_status_state, laye
 
 ZMK_SUBSCRIPTION(widget_layer_status, zmk_layer_state_changed);
 
-static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_state state) {
-    for (int i = 0; i < 9; i++) {
-        widget->state.wpm[i] = widget->state.wpm[i + 1];
-    }
-    widget->state.wpm[9] = state.wpm;
+static void set_keycode_status(struct zmk_widget_status *widget, struct keycode_status_state state) {
+    widget->state.pressed_keycode = state.pressed ? state.keycode : 0;
+    widget->state.pressed_usage_page = state.usage_page;
 
     draw_top(widget->obj, &widget->state);
 }
 
-static void wpm_status_update_cb(struct wpm_status_state state) {
+static void keycode_status_update_cb(struct keycode_status_state state) {
     struct zmk_widget_status *widget;
-    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_wpm_status(widget, state); }
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_keycode_status(widget, state); }
 }
 
-struct wpm_status_state wpm_status_get_state(const zmk_event_t *eh) {
-    return (struct wpm_status_state){.wpm = zmk_wpm_get_state()};
-};
+struct keycode_status_state keycode_status_get_state(const zmk_event_t *eh) {
+    const struct zmk_keycode_state_changed *ev = as_zmk_keycode_state_changed(eh);
+    return (struct keycode_status_state){
+        .keycode = (ev != NULL) ? ev->keycode : 0,
+        .usage_page = (ev != NULL) ? ev->usage_page : 0,
+        .pressed = (ev != NULL) ? ev->state : false,
+    };
+}
 
-ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm_status, struct wpm_status_state, wpm_status_update_cb,
-                            wpm_status_get_state)
-ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
+ZMK_DISPLAY_WIDGET_LISTENER(widget_keycode_status, struct keycode_status_state,
+                            keycode_status_update_cb, keycode_status_get_state)
+ZMK_SUBSCRIPTION(widget_keycode_status, zmk_keycode_state_changed);
 
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
@@ -346,7 +324,7 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget_battery_status_init();
     widget_output_status_init();
     widget_layer_status_init();
-//    widget_wpm_status_init();
+    widget_keycode_status_init();
 
     return 0;
 }
