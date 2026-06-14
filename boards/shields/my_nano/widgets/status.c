@@ -97,7 +97,7 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
 
     if (state->pressed_keycode != 0) {
         char key_text[6] = {};
-        snprintf(key_text, sizeof(key_text), "%s", zmk_hid_usage_to_string(state->usage_page, state->pressed_keycode);
+        snprintf(key_text, sizeof(key_text), "%s", zmk_hid_usage_to_string(state->usage_page, state->pressed_keycode, state->mods));
         lv_canvas_draw_text(canvas, 8, 35, 52, &label_dsc, key_text);
     }
 
