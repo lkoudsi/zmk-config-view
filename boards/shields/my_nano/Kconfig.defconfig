@@ -3,20 +3,13 @@
 
 if SHIELD_MY_NANO_VIEW
 
-config LS0XX_VCOM_THREAD_PRIO
-    int
-    default 11
-
 config LV_Z_VDB_SIZE
-    int
     default 100
 
 config LV_DPI_DEF
-    int
     default 161
 
 config LV_Z_BITS_PER_PIXEL
-    int
     default 1
 
 choice LV_COLOR_DEPTH
@@ -25,32 +18,17 @@ endchoice
 
 choice ZMK_DISPLAY_WORK_QUEUE
     default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
-
-config ZMK_DISPLAY_WORK_QUEUE_SYSTEM
-    bool "Use default system work queue for UI updates"
-
-config ZMK_DISPLAY_WORK_QUEUE_DEDICATED
-    bool "Use dedicated work queue for UI updates"
-
 endchoice
 
 choice ZMK_DISPLAY_STATUS_SCREEN
     default ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
-
-config ZMK_DISPLAY_STATUS_SCREEN_BUILT_IN
-    bool "Built in status screen"
-    select LV_FONT_MONTSERRAT_26
-
-config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
-    bool "Custom status screen"
-    imply NICE_VIEW_WIDGET_STATUS
-
 endchoice
 
 config LV_Z_MEM_POOL_SIZE
-    int
-    default 8192 if ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
-    default 5120 if ZMK_DISPLAY_STATUS_SCREEN_BUILT_IN
+    default 4096 if ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+
+config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+    imply NICE_VIEW_WIDGET_STATUS
 
 config NICE_VIEW_WIDGET_STATUS
     bool "Custom nice!view status widget"
@@ -71,5 +49,7 @@ config NICE_VIEW_WIDGET_STATUS
 
 endif # !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
 
+config ZMK_DISPLAY_STATUS_SCREEN_BUILT_IN
+    select LV_FONT_MONTSERRAT_26
+
 endif # SHIELD_MY_NANO_VIEW
- 
