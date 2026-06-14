@@ -24,6 +24,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/ble.h>
 #include <zmk/endpoints.h>
 #include <zmk/keymap.h>
+#include "hid_to_key_string.h"
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -45,6 +46,7 @@ struct keycode_status_state {
     uint32_t keycode;
     uint16_t usage_page;
     bool pressed;
+    uint8_t mods;
 };
 
 static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
@@ -89,13 +91,13 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
 
     lv_canvas_draw_text(canvas, 0, 0, CANVAS_SIZE, &label_dsc, output_text);
 
-    // Draw WPM
+    // Draw current key
     lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
     lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
 
     if (state->pressed_keycode != 0) {
-        char key_text[16] = {};
-        snprintf(key_text, sizeof(key_text), "0x%02X", state->pressed_keycode);
+        char key_text[6] = {};
+        snprintf(key_text, sizeof(key_text), "%s", zmk_hid_usage_to_string(state->usage_page, state->pressed_keycode);
         lv_canvas_draw_text(canvas, 8, 35, 52, &label_dsc, key_text);
     }
 
@@ -290,7 +292,6 @@ static void set_keycode_status(struct zmk_widget_status *widget, struct keycode_
  widget->state.pressed_keycode = state.pressed ? state.keycode : 0;
     widget->state.pressed_usage_page = state.usage_page;
 
-
     draw_top(widget->obj, widget->cbuf, &widget->state);
 }
 
@@ -305,6 +306,7 @@ struct keycode_status_state keycode_status_get_state(const zmk_event_t *eh) {
         .keycode = (ev != NULL) ? ev->keycode : 0,
         .usage_page = (ev != NULL) ? ev->usage_page : 0,
         .pressed = (ev != NULL) ? ev->state : false,
+        .mods = (ev != NULL) ? ev->implicit_modifiers | ev->explicit_modifiers : 0,
     };
 }
 
