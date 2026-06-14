@@ -294,10 +294,10 @@ static void set_keycode_status(struct zmk_widget_status *widget, struct keycode_
     draw_top(widget->obj, widget->cbuf, &widget->state);
 }
 
-// static void wpm_status_update_cb(struct wpm_status_state state) {
-//     struct zmk_widget_status *widget;
-//     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_wpm_status(widget, state); }
-// }
+ static void keycode_status_update_cb(struct wpm_status_state state) {
+     struct zmk_widget_status *widget;
+     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_keycode_status(widget, state); }
+ }
 
 struct keycode_status_state keycode_status_get_state(const zmk_event_t *eh) {
     const struct zmk_keycode_state_changed *ev = as_zmk_keycode_state_changed(eh);
