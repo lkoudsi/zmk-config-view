@@ -94,12 +94,8 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
     // Draw current key
     lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
     lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
-
-    if (state->pressed_keycode != 0) {
-        char key_text[6] = {};
-        snprintf(key_text, sizeof(key_text), "%s", zmk_hid_usage_to_string(state->usage_page, state->pressed_keycode, state->mods));
-        lv_canvas_draw_text(canvas, 8, 35, 52, &label_dsc, key_text);
-    }
+ 
+    lv_canvas_draw_text(canvas, 8, 35, 52, &label_dsc, state->pressed_key);
 
     // Rotate canvas
     rotate_canvas(canvas, cbuf);
@@ -289,16 +285,15 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_layer_status, struct layer_status_state, laye
 ZMK_SUBSCRIPTION(widget_layer_status, zmk_layer_state_changed);
 
 static void set_keycode_status(struct zmk_widget_status *widget, struct keycode_status_state state) {
- widget->state.pressed_keycode = state.pressed ? state.keycode : 0;
-    widget->state.pressed_usage_page = state.usage_page;
+    widget->state.pressed_key = zmk_hid_usage_to_string(state.usage_page, state.pressed_keycode, state.mods);
 
     draw_top(widget->obj, widget->cbuf, &widget->state);
 }
 
- static void keycode_status_update_cb(struct keycode_status_state state) {
-     struct zmk_widget_status *widget;
-     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_keycode_status(widget, state); }
- }
+static void keycode_status_update_cb(struct keycode_status_state state) {
+    struct zmk_widget_status *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_keycode_status(widget, state); }
+}
 
 struct keycode_status_state keycode_status_get_state(const zmk_event_t *eh) {
     const struct zmk_keycode_state_changed *ev = as_zmk_keycode_state_changed(eh);
