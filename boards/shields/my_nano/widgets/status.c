@@ -92,10 +92,10 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
     lv_canvas_draw_text(canvas, 0, 0, CANVAS_SIZE, &label_dsc, output_text);
 
     // Draw current key
-    lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
-    lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
+    //lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
+    //lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
  
-    lv_canvas_draw_text(canvas, 0, 8, 62, &label_dsc, state->pressed_key);
+    lv_canvas_draw_text(canvas, 1, 35, 62, &label_dsc, state->pressed_key);
 
     // Rotate canvas
     rotate_canvas(canvas, cbuf);
