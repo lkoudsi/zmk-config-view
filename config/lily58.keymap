@@ -53,13 +53,13 @@ display-name = "Base";
 // |  F1   |  F2 |  F3 |  F4  |  F5  |  F6  |                   |  F7  |  F8   |  F9   |  F10 |  F11  |  F12  |
 // | SHIFT |  !  |  @  |  #   |  $   |  %   |                   |  ^   |  &    |  *    |  (   |   )   |   ~   |
 // |  CTRL |     |     |      | HOME | END  |        |  |       |  \   |  _    |  +    |  {   |   }   |  "|"  |
-//                     |      |      |  `   |        |  |       |      |       |  GUI  |
+//                     |      |  ALT |  `   |        |  |       |      |       |  GUI  |
             bindings = <
 &bt BT_CLR &bt BT_SEL 0     &bt BT_SEL 1      &bt BT_SEL 2      &bt BT_SEL 3 &bt BT_SEL 4                 &none     &none     &none     &none     &none     &none
 &kp F1     &kp F2           &kp F3            &kp F4            &kp F5       &kp F6                       &kp F7    &kp F8    &kp F9    &kp F10   &kp F11   &kp F12
 &kp LSHFT  &kp EXCL         &kp AT            &kp HASH          &kp DOLLAR   &kp PRCNT                    &kp CARET &kp AMPS  &kp ASTRK &kp LPAR  &kp RPAR  &kp TILDE
 &kp LCTRL      &none            &none             &none             &kp HOME        &kp END       &none   &none    &kp BSLH     &kp MINUS &kp PLUS  &kp LBRC  &kp RBRC  &kp PIPE
-                                              &none             &none        &kp GRAVE        &none   &none    &none     &none    &kp RGUI
+                                              &none             &kp LALT        &kp GRAVE        &none   &none    &none     &none    &kp RGUI
             >;
 display-name = "Raise";
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
@@ -71,7 +71,7 @@ display-name = "Raise";
 // | CAP_W |     |     |  ^   |      | PG_UP|                   |      |   7   |   8   |  9   |   +   |       |
 // | SHIFT |     | <-  |  v   |  ->  | PG_DN|                   |      |   4   |   5   |  6   |   +   |       |
 // |  CTRL |     |     |      | HOME | END  |         |  |       |      |   1   |   2   |  3   |       |       |
-//                     |      |      |      |         |  |       |      |   0   |   .   |
+//                     |      |  ALT |      |         |  |       |      |   0   |   .   |
             
 display-name = "Lower";
 bindings = <
@@ -79,7 +79,7 @@ bindings = <
 &caps_word  &none   &none   &kp UP    &none    &kp PG_UP                     &none      &kp KP_N7  &kp KP_N8     &kp KP_N9         &kp KP_PLUS     &none
 &kp LSHFT       &none   &kp LEFT &kp DOWN  &kp RIGHT &kp PG_DN                     &none      &kp KP_N4  &kp KP_N5  &kp KP_N6   &kp KP_PLUS &none
 &kp LCTRL       &none   &none       &none      &kp HOME        &kp END     &none  &none   &none    &kp KP_N1  &kp KP_N2    &kp KP_N3   &none   &none
-                            &none    &none    &none  &none   &none    &none      &kp KP_N0    &kp KP_DOT
+                            &none    &kp LALT    &none  &none   &none    &none      &kp KP_N0    &kp KP_DOT
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
