@@ -67,7 +67,7 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
     lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE, &rect_black_dsc);
 
     // Draw battery
-    draw_battery(canvas, state);
+    // draw_battery(canvas, state);
 
     // Draw output status
     char output_text[10] = {};
@@ -97,7 +97,7 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
  
     //lv_canvas_draw_text(canvas, 1, 35, 62, &label_dsc, state->pressed_key);
     if( sprintf( output_text, "%i", state->battery ) >= 0 ) 
-        lv_canvas_draw_text(canvas, 1, 35, 62, &label_dsc, output_text);
+        lv_canvas_draw_text(canvas, 0, 2, 29, &label_dsc, output_text);
 
     // Rotate canvas
     rotate_canvas(canvas, cbuf);
