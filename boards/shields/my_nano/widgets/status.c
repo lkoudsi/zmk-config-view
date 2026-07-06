@@ -96,6 +96,7 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
     //lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
  
     //lv_canvas_draw_text(canvas, 1, 35, 62, &label_dsc, state->pressed_key);
+    lv_canvas_draw_text(canvas, 1, 35, 62, &label_dsc, state->battery);
 
     // Rotate canvas
     rotate_canvas(canvas, cbuf);
